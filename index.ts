@@ -163,7 +163,6 @@ const LOG = {
   PUSHING: 'Pushing files...',
   REDEPLOY_END: 'Updated deployment.',
   REDEPLOY_START: 'Updating deployment...',
-  RENAME_FILE: (oldName: string, newName: string) => `Renamed file: ${oldName} -> ${newName}`,
   UNDEPLOYMENT_FINISH: (deploymentId: string) => `Undeployed ${deploymentId}.`,
   UNDEPLOYMENT_START: (deploymentId: string) => `Undeploy ${deploymentId}...`,
   UNTITLED_SCRIPT_TITLE: 'Untitled Script',
@@ -613,22 +612,6 @@ commander
                 }
               });
 
-              // Check if there are files that will conflict if renamed .gs to .js
-              filePaths.map((name: string) => {
-                const fileNameWithoutExt = name.slice(0, -path.extname(name).length);
-                if (filePaths.indexOf(fileNameWithoutExt + '.js') !== -1 &&
-                  filePaths.indexOf(fileNameWithoutExt + '.gs') !== -1) {
-                  // Can't rename, conflicting files
-                  abortPush = true;
-                  if (path.extname(name) === '.gs') { // only print error once (for .gs)
-                    logError(null, ERROR.CONFLICTING_FILE_EXTENSION(fileNameWithoutExt));
-                  }
-                } else if (path.extname(name) === '.gs') {
-                  // rename file to js
-                  console.log(LOG.RENAME_FILE(fileNameWithoutExt + '.gs', fileNameWithoutExt + '.js'));
-                  fs.renameSync(fileNameWithoutExt + '.gs', fileNameWithoutExt + '.js');
-                }
-              });
               if (abortPush) return spinner.stop(true);
 
               const files = filePaths.map((name, i) => {
